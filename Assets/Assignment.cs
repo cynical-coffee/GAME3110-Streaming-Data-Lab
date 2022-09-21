@@ -4,8 +4,10 @@ This RPG data streaming assignment was created by Fernando Restituto.
 Pixel RPG characters created by Sean Browning.
 */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 
@@ -75,16 +77,52 @@ static public class AssignmentPart1
 
     static public void SavePartyButtonPressed()
     {
-        foreach (PartyCharacter pc in GameContent.partyCharacters)
+        using (System.IO.TextWriter mTextWriter = new StreamWriter("SaveFile.txt"))
         {
-            Debug.Log("PC class id == " + pc.classID);
+            foreach (PartyCharacter pc in GameContent.partyCharacters)
+            {
+              mTextWriter.WriteLine(pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom);
+            }
         }
+        Debug.Log("Saved!");
+        
     }
 
     static public void LoadPartyButtonPressed()
     {
 
-        //GameContent.partyCharacters.Clear();
+        GameContent.partyCharacters.Clear();
+        string mCurrentLine = "";
+        string[] sStats;
+        int[] iCharaterStats = new[] { 0, 0, 0, 0, 0, 0 };
+        using (System.IO.TextReader mTextReader = new StreamReader("Savefile.txt"))
+        {
+            //partySize = Convert.ToInt32(textReader.ReadLine());
+            //Debug.Log($"Party Size: {partySize}");
+
+            while ((mCurrentLine = mTextReader.ReadLine()) != null)
+            {
+                sStats = mCurrentLine.Split(",");
+                foreach (var characterStat in sStats)
+                {
+                    Debug.Log($"Stat: {characterStat}");
+                }
+
+                for (int i = 0; i < 6; i++)
+                {
+                    iCharaterStats[i] = Convert.ToInt32(sStats[i]);
+                }
+
+                PartyCharacter pc = new PartyCharacter(iCharaterStats[0], iCharaterStats[1], iCharaterStats[2], iCharaterStats[3], iCharaterStats[4], iCharaterStats[5]);
+                GameContent.partyCharacters.AddLast(pc);
+
+                //for (int i = 0; i < partySize; i++)
+                //{
+                //    PartyCharacter pc = new PartyCharacter(Convert.ToInt32(characterStats[0]),0, 0, 0,0, 0);
+                //    GameContent.partyCharacters.AddLast(pc);
+                //}
+            }
+        }
 
         GameContent.RefreshUI();
 
