@@ -90,15 +90,12 @@ static public class AssignmentPart1
 
     static public void LoadPartyButtonPressed()
     {
-
         GameContent.partyCharacters.Clear();
-        string mCurrentLine = "";
-        string[] sStats;
-        int[] iCharaterStats = new[] { 0, 0, 0, 0, 0, 0 };
         using (System.IO.TextReader mTextReader = new StreamReader("Savefile.txt"))
         {
-            //partySize = Convert.ToInt32(textReader.ReadLine());
-            //Debug.Log($"Party Size: {partySize}");
+            string mCurrentLine = "";
+            string[] sStats;
+            int[] iCharaterStats = new[] { 0, 0, 0, 0, 0, 0 };
 
             while ((mCurrentLine = mTextReader.ReadLine()) != null)
             {
@@ -108,26 +105,19 @@ static public class AssignmentPart1
                     Debug.Log($"Stat: {characterStat}");
                 }
 
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < iCharaterStats.Length; i++)
                 {
-                    iCharaterStats[i] = Convert.ToInt32(sStats[i]);
+                    iCharaterStats[i] =Int32.Parse(sStats[i]);
                 }
 
                 PartyCharacter pc = new PartyCharacter(iCharaterStats[0], iCharaterStats[1], iCharaterStats[2], iCharaterStats[3], iCharaterStats[4], iCharaterStats[5]);
                 GameContent.partyCharacters.AddLast(pc);
-
-                //for (int i = 0; i < partySize; i++)
-                //{
-                //    PartyCharacter pc = new PartyCharacter(Convert.ToInt32(characterStats[0]),0, 0, 0,0, 0);
-                //    GameContent.partyCharacters.AddLast(pc);
-                //}
             }
         }
 
         GameContent.RefreshUI();
-
+        Debug.Log("Loaded!");
     }
-
 }
 
 
