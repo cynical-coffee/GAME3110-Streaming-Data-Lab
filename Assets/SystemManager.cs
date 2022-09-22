@@ -155,6 +155,7 @@ public class SystemManager : MonoBehaviour
                     pos++;
                     partyCharacters.AddLast(go);
 
+                    Debug.Log("class id check 2: " + pc.classID);
                     string info = GameContent.CharacterClassID.lookUp[pc.classID] + "\n" +
                         "HP: " + pc.health + "\n" +
                         "MP: " + pc.mana + "\n" +

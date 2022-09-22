@@ -125,6 +125,11 @@ static public class AssignmentPart1
                     pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3], iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
                     GameContent.partyCharacters.AddLast(pc);
                 }
+                if (mCurrentLine.StartsWith('1'))
+                {
+                    Debug.Log("Line 2");
+                    string[] sEquipmentID;
+                    int[] iCharacterEquips = new int[2];
 
                 if (mCurrentLine.StartsWith(mEquipSignifier))
                 {
@@ -138,6 +143,8 @@ static public class AssignmentPart1
                 }
                 
             }
+            GameContent.RefreshUI();
+            Debug.Log("Loaded!");
         }
         GameContent.RefreshUI();
         Debug.Log("Loaded!");
