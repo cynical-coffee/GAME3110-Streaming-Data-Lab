@@ -74,47 +74,71 @@ public partial class PartyCharacter
 
 static public class AssignmentPart1
 {
+    private const string mStatsSignifier = "0";
+    private const string mEquipSignifier = "1";
 
     static public void SavePartyButtonPressed()
     {
-        using (System.IO.TextWriter mTextWriter = new StreamWriter("SaveFile.txt"))
+        using (System.IO.StreamWriter mStreamWriter = new StreamWriter("SaveFile.txt"))
         {
             foreach (PartyCharacter pc in GameContent.partyCharacters)
             {
-              mTextWriter.WriteLine(pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom);
+              mStreamWriter.WriteLine(mStatsSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom );
+
+                foreach (int iCurrentEquip in pc.equipment)
+                {
+                    mStreamWriter.WriteLine(mEquipSignifier + "," + iCurrentEquip);
+                }
             }
         }
         Debug.Log("Saved!");
-        
     }
 
     static public void LoadPartyButtonPressed()
     {
         GameContent.partyCharacters.Clear();
-        using (System.IO.TextReader mTextReader = new StreamReader("Savefile.txt"))
+        using (System.IO.StreamReader mStreamReader = new StreamReader("Savefile.txt"))
         {
             string mCurrentLine = "";
+
             string[] sStats;
-            int[] iCharaterStats = new[] { 0, 0, 0, 0, 0, 0 };
+            int[] iCharacterStats = new int[7];
 
-            while ((mCurrentLine = mTextReader.ReadLine()) != null)
+            string[] sEquipment;
+            int[] iEquipmentID = new int[3];
+
+            PartyCharacter pc = null;
+
+            while ((mCurrentLine = mStreamReader.ReadLine()) != null)
             {
-                sStats = mCurrentLine.Split(",");
-                foreach (var characterStat in sStats)
+                
+                Debug.Log("Current Line: " + mCurrentLine);
+                if (mCurrentLine.StartsWith(mStatsSignifier))
                 {
-                    Debug.Log($"Stat: {characterStat}");
+                   
+                    sStats = mCurrentLine.Split(",");
+                    for (int i = 0; i < sStats.Length; i++)
+                    {
+                        iCharacterStats[i] = Int32.Parse(sStats[i]);
+                    }
+
+                    pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3], iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
+                    GameContent.partyCharacters.AddLast(pc);
                 }
 
-                for (int i = 0; i < iCharaterStats.Length; i++)
+                if (mCurrentLine.StartsWith(mEquipSignifier))
                 {
-                    iCharaterStats[i] =Int32.Parse(sStats[i]);
-                }
+                    sEquipment = mCurrentLine.Split(",");
+                    for (int i = 0; i < sEquipment.Length; i++)
+                    {
+                        iEquipmentID[i] = Int32.Parse(sEquipment[i]);
+                    }
 
-                PartyCharacter pc = new PartyCharacter(iCharaterStats[0], iCharaterStats[1], iCharaterStats[2], iCharaterStats[3], iCharaterStats[4], iCharaterStats[5]);
-                GameContent.partyCharacters.AddLast(pc);
+                    pc.equipment.AddLast(iEquipmentID[1]);
+                }
+                
             }
         }
-
         GameContent.RefreshUI();
         Debug.Log("Loaded!");
     }
