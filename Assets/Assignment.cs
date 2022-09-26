@@ -97,7 +97,7 @@ static public class AssignmentPart1
     static public void LoadPartyButtonPressed()
     {
         GameContent.partyCharacters.Clear();
-        using (System.IO.StreamReader mStreamReader = new StreamReader("Savefile.txt"))
+        using (System.IO.StreamReader mStreamReader = new StreamReader("Savefile0.txt"))
         {
             string mCurrentLine = "";
 
@@ -156,7 +156,7 @@ static public class AssignmentPart1
 //  This will enable the needed UI/function calls for your to proceed with your assignment.
 static public class AssignmentConfiguration
 {
-    public const int PartOfAssignmentThatIsInDevelopment = 1;
+    public const int PartOfAssignmentThatIsInDevelopment = 2;
 }
 
 /*
@@ -194,6 +194,8 @@ Good luck, journey well.
 
 static public class AssignmentPart2
 {
+    private const string mStatsSignifier = "0";
+    private const string mEquipSignifier = "1";
 
     static public void GameStart()
     {
@@ -205,28 +207,88 @@ static public class AssignmentPart2
     static public List<string> GetListOfPartyNames()
     {
         return new List<string>() {
-            "sample 1",
-            "sample 2",
-            "sample 3"
+            "SaveFile1",
+            "SaveFile2",
+            "SaveFile3"
         };
 
     }
 
     static public void LoadPartyDropDownChanged(string selectedName)
     {
-        GameContent.RefreshUI();
+         GameContent.partyCharacters.Clear();
+        using (System.IO.StreamReader mStreamReader = new StreamReader($"{selectedName}.txt"))
+        {
+
+            string mCurrentLine = "";
+
+            string[] sStats;
+            int[] iCharacterStats = new int[7];
+
+            string[] sEquipment;
+            int[] iEquipmentID = new int[3];
+
+            PartyCharacter pc = null;
+
+            while ((mCurrentLine = mStreamReader.ReadLine()) != null)
+            {
+
+                Debug.Log("Current Line: " + mCurrentLine);
+                if (mCurrentLine.StartsWith(mStatsSignifier))
+                {
+
+                    sStats = mCurrentLine.Split(",");
+                    for (int i = 0; i < sStats.Length; i++)
+                    {
+                        iCharacterStats[i] = Int32.Parse(sStats[i]);
+                    }
+
+                    pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3],
+                        iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
+                    GameContent.partyCharacters.AddLast(pc);
+                }
+
+                if (mCurrentLine.StartsWith(mEquipSignifier))
+                {
+                    sEquipment = mCurrentLine.Split(",");
+                    for (int i = 0; i < sEquipment.Length; i++)
+                    {
+                        iEquipmentID[i] = Int32.Parse(sEquipment[i]);
+                    }
+
+                    pc.equipment.AddLast(iEquipmentID[1]);
+                }
+
+                GameContent.RefreshUI();
+                Debug.Log("Loaded!");
+            }
+        }
     }
 
     static public void SavePartyButtonPressed()
     {
         GameContent.RefreshUI();
+        using (System.IO.StreamWriter mStreamWriter = new StreamWriter(GameContent.GetPartyNameFromInput() + ".txt"))
+        {
+            
+            foreach (PartyCharacter pc in GameContent.partyCharacters)
+            {
+                mStreamWriter.WriteLine(mStatsSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom);
+
+                foreach (int iCurrentEquip in pc.equipment)
+                {
+                    mStreamWriter.WriteLine(mEquipSignifier + "," + iCurrentEquip);
+                }
+            }
+        }
+        Debug.Log("Saved!");
     }
 
     static public void NewPartyButtonPressed()
     {
 
     }
-
+     
     static public void DeletePartyButtonPressed()
     {
 
