@@ -104,7 +104,7 @@ public class SystemManager : MonoBehaviour
         else if (AssignmentConfiguration.PartOfAssignmentThatIsInDevelopment == 2)
         {
             saveButton2.SetActive(true);
-            //newButton.SetActive(true);
+            newButton.SetActive(true);
             deleteButton.SetActive(true);
             partyNameInputField.SetActive(true);
             loadPartyDropDown.SetActive(true);
