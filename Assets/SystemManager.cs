@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -125,7 +126,6 @@ public class SystemManager : MonoBehaviour
             {
                 dropdown.options.Add(new Dropdown.OptionData(option));
             }
-
         }
 
 
@@ -155,7 +155,6 @@ public class SystemManager : MonoBehaviour
                     pos++;
                     partyCharacters.AddLast(go);
 
-                    Debug.Log("class id check 2: " + pc.classID);
                     string info = GameContent.CharacterClassID.lookUp[pc.classID] + "\n" +
                         "HP: " + pc.health + "\n" +
                         "MP: " + pc.mana + "\n" +

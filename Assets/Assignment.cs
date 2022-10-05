@@ -7,8 +7,10 @@ Pixel RPG characters created by Sean Browning.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using UnityEngine;
+using System.Linq;
+using Debug = UnityEngine.Debug;
 
 
 #region Assignment Instructions
@@ -83,7 +85,8 @@ static public class AssignmentPart1
         {
             foreach (PartyCharacter pc in GameContent.partyCharacters)
             {
-              mStreamWriter.WriteLine(mStatsSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom );
+                mStreamWriter.WriteLine(mStatsSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," +
+                                        pc.strength + "," + pc.agility + "," + pc.wisdom);
 
                 foreach (int iCurrentEquip in pc.equipment)
                 {
@@ -91,6 +94,7 @@ static public class AssignmentPart1
                 }
             }
         }
+
         Debug.Log("Saved!");
     }
 
@@ -111,60 +115,62 @@ static public class AssignmentPart1
 
             while ((mCurrentLine = mStreamReader.ReadLine()) != null)
             {
-                
-                Debug.Log("Current Line: " + mCurrentLine);
+
                 if (mCurrentLine.StartsWith(mStatsSignifier))
                 {
-                   
+
                     sStats = mCurrentLine.Split(",");
                     for (int i = 0; i < sStats.Length; i++)
                     {
                         iCharacterStats[i] = Int32.Parse(sStats[i]);
                     }
 
-                    pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3], iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
+                    pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3],
+                        iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
                     GameContent.partyCharacters.AddLast(pc);
                 }
+
                 if (mCurrentLine.StartsWith('1'))
                 {
                     Debug.Log("Line 2");
                     string[] sEquipmentID;
                     int[] iCharacterEquips = new int[2];
 
-                if (mCurrentLine.StartsWith(mEquipSignifier))
-                {
-                    sEquipment = mCurrentLine.Split(",");
-                    for (int i = 0; i < sEquipment.Length; i++)
+                    if (mCurrentLine.StartsWith(mEquipSignifier))
                     {
-                        iEquipmentID[i] = Int32.Parse(sEquipment[i]);
+                        sEquipment = mCurrentLine.Split(",");
+                        for (int i = 0; i < sEquipment.Length; i++)
+                        {
+                            iEquipmentID[i] = Int32.Parse(sEquipment[i]);
+                        }
+
+                        pc.equipment.AddLast(iEquipmentID[1]);
                     }
 
-                    pc.equipment.AddLast(iEquipmentID[1]);
                 }
-                
+
             }
+
             GameContent.RefreshUI();
             Debug.Log("Loaded!");
         }
-        GameContent.RefreshUI();
-        Debug.Log("Loaded!");
     }
-}
 
+}
 
 #endregion
 
 
-#region Assignment Part 2
+    #region Assignment Part 2
 
 //  Before Proceeding!
 //  To inform the internal systems that you are proceeding onto the second part of this assignment,
 //  change the below value of AssignmentConfiguration.PartOfAssignmentInDevelopment from 1 to 2.
 //  This will enable the needed UI/function calls for your to proceed with your assignment.
-static public class AssignmentConfiguration
-{
-    public const int PartOfAssignmentThatIsInDevelopment = 2;
-}
+    static public class AssignmentConfiguration
+    {
+        public const int PartOfAssignmentThatIsInDevelopment = 2;
+    }
 
 /*
 
@@ -199,109 +205,118 @@ Good luck, journey well.
 
 */
 
-static public class AssignmentPart2
-{
-    private const string mStatsSignifier = "0";
-    private const string mEquipSignifier = "1";
-
-    static public void GameStart()
+    static public class AssignmentPart2
     {
+        private const string mStatsSignifier = "0";
+        private const string mEquipSignifier = "1";
 
-        GameContent.RefreshUI();
-
-    }
-
-    static public List<string> GetListOfPartyNames()
-    {
-        return new List<string>() {
-            "SaveFile1",
-            "SaveFile2",
-            "SaveFile3"
-        };
-
-    }
-
-    static public void LoadPartyDropDownChanged(string selectedName)
-    {
-         GameContent.partyCharacters.Clear();
-        using (System.IO.StreamReader mStreamReader = new StreamReader($"{selectedName}.txt"))
+        private static List <string> mUserPartyListNames = new();
+        static public void GameStart()
         {
-
-            string mCurrentLine = "";
-
-            string[] sStats;
-            int[] iCharacterStats = new int[7];
-
-            string[] sEquipment;
-            int[] iEquipmentID = new int[3];
-
-            PartyCharacter pc = null;
-
-            while ((mCurrentLine = mStreamReader.ReadLine()) != null)
-            {
-
-                Debug.Log("Current Line: " + mCurrentLine);
-                if (mCurrentLine.StartsWith(mStatsSignifier))
-                {
-
-                    sStats = mCurrentLine.Split(",");
-                    for (int i = 0; i < sStats.Length; i++)
-                    {
-                        iCharacterStats[i] = Int32.Parse(sStats[i]);
-                    }
-
-                    pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3],
-                        iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
-                    GameContent.partyCharacters.AddLast(pc);
-                }
-
-                if (mCurrentLine.StartsWith(mEquipSignifier))
-                {
-                    sEquipment = mCurrentLine.Split(",");
-                    for (int i = 0; i < sEquipment.Length; i++)
-                    {
-                        iEquipmentID[i] = Int32.Parse(sEquipment[i]);
-                    }
-
-                    pc.equipment.AddLast(iEquipmentID[1]);
-                }
-
-                GameContent.RefreshUI();
-                Debug.Log("Loaded!");
-            }
+            GetFileNames();
+            GameContent.RefreshUI();
         }
-    }
 
-    static public void SavePartyButtonPressed()
-    {
-        GameContent.RefreshUI();
-        using (System.IO.StreamWriter mStreamWriter = new StreamWriter(GameContent.GetPartyNameFromInput() + ".txt"))
+        static public void GetFileNames()
         {
-            
-            foreach (PartyCharacter pc in GameContent.partyCharacters)
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Saves");
+            string[] saveFileNames = Directory.GetFiles(path,"*.txt");
+            for (int i = 0; i < saveFileNames.Length; i++)
             {
-                mStreamWriter.WriteLine(mStatsSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom);
+                
+            }
 
-                foreach (int iCurrentEquip in pc.equipment)
+            //foreach (string fileName in sSaveFileNames)
+            //{
+            //    GetListOfPartyNames().Add(fileName);
+            //}
+        }
+
+        static public List<string> GetListOfPartyNames()
+        {
+            return mUserPartyListNames;
+        }
+
+        static public void LoadPartyDropDownChanged(string selectedName)
+        {
+            GameContent.partyCharacters.Clear();
+            using (System.IO.StreamReader mStreamReader = new StreamReader($"{selectedName}.txt"))
+            {
+                string mCurrentLine = "";
+
+                string[] sStats;
+                int[] iCharacterStats = new int[7];
+
+                string[] sEquipment;
+                int[] iEquipmentID = new int[3];
+
+                PartyCharacter pc = null;
+                while ((mCurrentLine = mStreamReader.ReadLine()) != null)
                 {
-                    mStreamWriter.WriteLine(mEquipSignifier + "," + iCurrentEquip);
+
+                    Debug.Log("Current Line: " + mCurrentLine);
+                    if (mCurrentLine.StartsWith(mStatsSignifier))
+                    {
+
+                        sStats = mCurrentLine.Split(",");
+                        for (int i = 0; i < sStats.Length; i++)
+                        {
+                            iCharacterStats[i] = Int32.Parse(sStats[i]);
+                        }
+
+                        pc = new PartyCharacter(iCharacterStats[1], iCharacterStats[2], iCharacterStats[3],
+                            iCharacterStats[4], iCharacterStats[5], iCharacterStats[6]);
+                        GameContent.partyCharacters.AddLast(pc);
+                    }
+
+                    if (mCurrentLine.StartsWith(mEquipSignifier))
+                    {
+                        sEquipment = mCurrentLine.Split(",");
+                        for (int i = 0; i < sEquipment.Length; i++)
+                        {
+                            iEquipmentID[i] = Int32.Parse(sEquipment[i]);
+                        }
+
+                        pc.equipment.AddLast(iEquipmentID[1]);
+                    }
+
+                    GameContent.RefreshUI();
+                    Debug.Log("Loaded!");
                 }
             }
         }
-        Debug.Log("Saved!");
+
+        static public void SavePartyButtonPressed()
+        {
+            string sNewSaveName = GameContent.GetPartyNameFromInput();
+            using (System.IO.StreamWriter
+                   mStreamWriter = new StreamWriter(@$"Saves\{sNewSaveName}.txt"))
+            { 
+                mUserPartyListNames.Add(sNewSaveName);
+                foreach (PartyCharacter pc in GameContent.partyCharacters)
+                {
+                    mStreamWriter.WriteLine(mStatsSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom);
+                    foreach (int iCurrentEquip in pc.equipment)
+                    {
+                        mStreamWriter.WriteLine(mEquipSignifier + "," + iCurrentEquip);
+                    }
+                }
+            }
+            Debug.Log($"{sNewSaveName} File Saved!");
+            GameContent.RefreshUI();
+        }
+
+        static public void NewPartyButtonPressed()
+        {
+
+        }
+
+        static public void DeletePartyButtonPressed()
+        {
+
+        }
     }
 
-    static public void NewPartyButtonPressed()
-    {
-
-    }
-     
-    static public void DeletePartyButtonPressed()
-    {
-
-    }
-
-}
 
 #endregion
 
