@@ -94,7 +94,6 @@ static public class AssignmentPart1
                 }
             }
         }
-
         Debug.Log("Saved!");
     }
 
@@ -115,7 +114,6 @@ static public class AssignmentPart1
 
             while ((mCurrentLine = mStreamReader.ReadLine()) != null)
             {
-
                 if (mCurrentLine.StartsWith(mStatsSignifier))
                 {
 
@@ -133,7 +131,6 @@ static public class AssignmentPart1
                 if (mCurrentLine.StartsWith('1'))
                 {
                     Debug.Log("Line 2");
-                    string[] sEquipmentID;
                     int[] iCharacterEquips = new int[2];
 
                     if (mCurrentLine.StartsWith(mEquipSignifier))
@@ -146,9 +143,7 @@ static public class AssignmentPart1
 
                         pc.equipment.AddLast(iEquipmentID[1]);
                     }
-
                 }
-
             }
 
             GameContent.RefreshUI();
@@ -209,8 +204,9 @@ Good luck, journey well.
     {
         private const string mStatsSignifier = "0";
         private const string mEquipSignifier = "1";
-
         private static List <string> mUserPartyListNames = new();
+        private static string mCurrentSave = "";
+
         static public void GameStart()
         {
             GetFileNames();
@@ -220,16 +216,17 @@ Good luck, journey well.
         static public void GetFileNames()
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Saves");
-            string[] saveFileNames = Directory.GetFiles(path,"*.txt");
+            string[] saveFileNames = Directory.GetFiles(path, "*.txt");
+
             for (int i = 0; i < saveFileNames.Length; i++)
             {
-                
+                saveFileNames[i] = Path.GetFileNameWithoutExtension(saveFileNames[i]);
             }
 
-            //foreach (string fileName in sSaveFileNames)
-            //{
-            //    GetListOfPartyNames().Add(fileName);
-            //}
+            foreach (string fileName in saveFileNames)
+            {
+                GetListOfPartyNames().Add(fileName);
+            }
         }
 
         static public List<string> GetListOfPartyNames()
@@ -240,7 +237,8 @@ Good luck, journey well.
         static public void LoadPartyDropDownChanged(string selectedName)
         {
             GameContent.partyCharacters.Clear();
-            using (System.IO.StreamReader mStreamReader = new StreamReader($"{selectedName}.txt"))
+            mCurrentSave = selectedName;
+            using (System.IO.StreamReader mStreamReader = new StreamReader(@$"Saves\{selectedName}.txt"))
             {
                 string mCurrentLine = "";
 
@@ -306,14 +304,21 @@ Good luck, journey well.
             GameContent.RefreshUI();
         }
 
-        static public void NewPartyButtonPressed()
-        {
-
-        }
-
         static public void DeletePartyButtonPressed()
         {
-
+            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), @$"Saves\{mCurrentSave}.txt")))
+            {
+                File.Delete(@$"Saves\{mCurrentSave}.txt");
+                mUserPartyListNames.Remove(mCurrentSave);
+                GameContent.partyCharacters.Clear();
+                GameContent.RerollParty();
+                GameContent.RefreshUI();
+                Debug.Log($"{mCurrentSave} has be deleted!");
+            }
+            else
+            {
+                Debug.Log("File not found.");
+            }
         }
     }
 

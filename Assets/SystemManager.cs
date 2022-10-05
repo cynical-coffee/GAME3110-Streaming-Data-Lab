@@ -22,7 +22,7 @@ public class SystemManager : MonoBehaviour
     Dictionary<int, Sprite> spriteLookUp;
 
     GameObject saveButton2;
-    GameObject newButton;
+   
     GameObject deleteButton;
 
     void Start()
@@ -55,8 +55,6 @@ public class SystemManager : MonoBehaviour
                 loadPartyDropDown = (GameObject)go;
             else if (go.name == "SaveButton2")
                 saveButton2 = (GameObject)go;
-            else if (go.name == "NewButton")
-                newButton = (GameObject)go;
             else if (go.name == "DeleteButton")
                 deleteButton = (GameObject)go;
         }
@@ -69,7 +67,6 @@ public class SystemManager : MonoBehaviour
         loadPartyDropDown.GetComponent<Dropdown>().onValueChanged.AddListener(delegate { LoadDropDownChanged(); });
 
         saveButton2.GetComponent<Button>().onClick.AddListener(SaveButton2Pressed);
-        newButton.GetComponent<Button>().onClick.AddListener(NewButtonPressed);
         deleteButton.GetComponent<Button>().onClick.AddListener(DeleteButtonPressed);
 
         GameContent.SetSystemManager(gameObject);
@@ -92,7 +89,6 @@ public class SystemManager : MonoBehaviour
         rerollButton.SetActive(false);
         partyNameInputField.SetActive(false);
         loadPartyDropDown.SetActive(false);
-        newButton.SetActive(false);
         deleteButton.SetActive(false);
         saveButton2.SetActive(false);
 
@@ -105,7 +101,6 @@ public class SystemManager : MonoBehaviour
         else if (AssignmentConfiguration.PartOfAssignmentThatIsInDevelopment == 2)
         {
             saveButton2.SetActive(true);
-            newButton.SetActive(true);
             deleteButton.SetActive(true);
             partyNameInputField.SetActive(true);
             loadPartyDropDown.SetActive(true);
@@ -207,10 +202,6 @@ public class SystemManager : MonoBehaviour
         AssignmentPart2.SavePartyButtonPressed();
     }
 
-    public void NewButtonPressed()
-    {
-        AssignmentPart2.NewPartyButtonPressed();
-    }
 
     public void DeleteButtonPressed()
     {
